@@ -1,5 +1,5 @@
 from unittest import TestCase, main
-from extract_data_api import ExtractDataAPI
+from plugins.extract_data_api import ExtractDataAPI
 from unittest.mock import mock_open, patch
 from airflow.sdk import ObjectStoragePath
 from airflow.models import Connection

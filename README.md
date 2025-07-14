@@ -14,6 +14,7 @@ The project was defined based in airflow structure which is:
 
     4. plugins - Onde ficam armazenados os códigos externos, sejam bibliotecas, sejam scripts para processamento, etc.
 
+    5. tests - Onde ficam os tests unitários.
 
 
 A primeira etapa pra se executar nesse pipe é a de configuração e instalação. Para isso, na pasta raiz basta digitar o seguinte comando:

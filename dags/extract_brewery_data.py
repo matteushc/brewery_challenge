@@ -11,10 +11,20 @@ api_url = "https://api.openbrewerydb.org/v1/breweries"
 base = ObjectStoragePath("s3://airflow-brewery-list/", conn_id="AWS_CONNECTION")
 
 
+def on_failure_callback(context):
+    """
+    Callback function to handle task failures.
+    This can be used to send notifications or log errors.
+    """
+    # Implement your failure handling logic here
+    print(f"Task failed: {context['task_instance'].task_id} at {context['ts']}")
+
+
 @dag(
     schedule=None,
     start_date=pendulum.datetime(2025, 1, 1, tz="UTC"),
     catchup=False,
+    on_failure_callback=on_failure_callback,
 )
 def run_pipeline_brewery():
     """
@@ -22,7 +32,7 @@ def run_pipeline_brewery():
     """
 
 
-    @task(retries=3, retry_delay=timedelta(seconds=5))
+    @task(retries=3, retry_delay=timedelta(seconds=5),)
     def extract_data(**kwargs):
         """
         #### Get Air Quality Data
