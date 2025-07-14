@@ -6,7 +6,7 @@ from pyspark.sql import SparkSession
 
 class SaveGoldLayer:
 
-    BUCKET_NAME = "airflow-data-create"
+    BUCKET_NAME = "airflow-brewery-list"
     LAYER_READ = "silver"
     LAYER_TYPE = "gold"
 

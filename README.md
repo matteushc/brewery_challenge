@@ -50,7 +50,7 @@ Outro ponto para incluir nesse processo seria criar uma função `on_failure_cal
 
 ## Execution
 
-* Esse projeto foi criado para rodar usando o serviço do s3 da Amazon para salvar os dados gerados. Portanto é necessário ter duas chaves de autenticação para poder rodar o processo, que são elas: `AWS_ACCESS_KEY_ID` e `AWS_SECRET_ACCESS_KEY`. 
+* Esse projeto foi criado para rodar usando o serviço do s3 da Amazon para salvar os dados gerados. Portanto é necessário ter duas chaves de autenticação para poder rodar o processo, que são elas: `AWS_ACCESS_KEY_ID` e `AWS_SECRET_ACCESS_KEY`. Essas chaves são geradas na seguinte url da sua conta na aws: https://us-east-1.console.aws.amazon.com/iam/home?region=us-east-1#/security_credentials. Nesse link existe um botão **Create access key**. Após gerar as credenciais, favor baixa-las e pegar os codigos delas e incluir no arquivo **Makefile** de acordo com as respectivas variáveis.
 
 
 

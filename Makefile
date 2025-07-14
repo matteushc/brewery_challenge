@@ -1,7 +1,7 @@
 .EXPORT_ALL_VARIABLES:
 
-AWS_ACCESS_KEY_ID = ""
-AWS_SECRET_ACCESS_KEY = ""
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
 
 build:
 	docker build -t apache/airflow:3.0.1 .
@@ -13,8 +13,8 @@ start_environment:
 
 	@echo "AIRFLOW_UID=$$(id -u)\nAIRFLOW_GID=0" > .env
 
-	@echo "AWS_ACCESS_KEY_ID=$$(AWS_ACCESS_KEY_ID)" >> .env
-	@echo "AWS_SECRET_ACCESS_KEY=$$(AWS_SECRET_ACCESS_KEY)" >> .env
+	@echo "AWS_ACCESS_KEY_ID=$$AWS_ACCESS_KEY_ID" >> .env
+	@echo "AWS_SECRET_ACCESS_KEY=$$AWS_SECRET_ACCESS_KEY" >> .env
 
 	docker compose run airflow-cli airflow config list
 
@@ -28,7 +28,7 @@ install_dependencies:
 	pip install -r requirements.txt
 
 start_pipeline:
-	docker compose --env-file .env up -d
+	docker compose up -d
 	
 run_pipeline:
 	docker exec -it brewery_challenge-airflow-scheduler-1 airflow dags unpause run_pipeline_brewery
