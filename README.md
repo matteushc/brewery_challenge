@@ -3,7 +3,7 @@
 
 ## Tools
 
-* O pipeline desenvolvido aqui foi usando ferramentas como Docker, Python, Spark e airflow com orquestrador.
+* The pipeline developed here was using tools like Docker, Python, Spark and airflow as orchestrator.
 
 
 ## Architecture
@@ -15,81 +15,89 @@
 
 * The project was defined based in airflow structure which is:
 
-    1. config - Para armazenar as configurações necessarias do airflow
+    1. config - To store the necessary airflow settings
 
-    2. dags - Onde ficam os códigos das DAGs que norteam o pipeline 
+    2. dags - where are the DAG codes that guide the pipeline 
 
-    3. logs - Onde ficam armazenados os logs.
+    3. logs - where the logs are stored
 
-    4. plugins - Onde ficam armazenados os códigos externos, sejam bibliotecas, sejam scripts para processamento, etc.
+    4. plugins - where external codes are stored, whether libraries, processing scripts, etc.
 
-    5. tests - Onde ficam os tests unitários.
+    5. tests - where are the unit tests.
 
 
 ### plugins folder:
 
-* A pasta plugins foi usada nesse processo para armazenar os script para processamento do pipeline. Foram construidos 3 arquivos: extract_data_api.py, save_silver_layer.py e save_gold_layer.py. A ideia foi estruturar o processo segregado em scripts diferentes para modularizar e facilitar a manutenção de cada etapa do processo indivualemente.
+* The plugins folder was used in this process to store the pipeline processing scripts. Three files were created: extract_data_api.py, save_silver_layer.py, and save_gold_layer.py. The idea was to structure the process into separate scripts to modularize and facilitate the maintenance of each individual step.
 
-    - extract_data_api.py: Script responsável por extrair os dados da API `https://api.openbrewerydb.org/v1/breweries` e salvar um arquivo json na camada bronze.
+    - extract_data_api.py: Script responsible for extracting data from the API `https://api.openbrewerydb.org/v1/breweries` and saving a json file in the bronze layer.
 
-    - save_silver_layer.py: Script responsável por ler o arquivo json da camada bronze e transforma-lo em arquivo parquet particionado pela localização da brewery, e que nesse caso o escolhido foi country e state.
+    - save_silver_layer.py: Script responsible for reading the json file from the bronze layer and transforming it into a parquet file partitioned by the brewery's location, and in this case the chosen one was country and state.
 
-    - save_gold_layer.py: Script responsável por ler o arquivo parquet da camada silver e agrega-lo pela quantidade de brewery pelo type and location e salvar num arquivo no formato parquet na camada gold.
+    - save_gold_layer.py: Script responsible for reading the parquet file from the silver layer and aggregating it by the quantity of breweries by type and location and saving it in a file in parquet format in the gold layer.
 
 ### dags
 
 
-* Na pasta DAGs contém o arquivo extract_brewery_data.py que é a DAG do pipeline. Nele está o metodo principal da DAG chamado run_pipeline_brewery, onde vai conter todas as etapas do pipeline. Dentro desse metodo existem mais 3, extract_data, save_silver_layer e save_gold_layer. Esses metodos estão como task decorator do airflow dentro da DAG para facilitar o desenvolvimento do projeto, porém num ambiente de produção poderiamos colocar os Operators para controlar melhor o fluxo. No caso dos processos pyspark poderiamos colocar o EmrCreateJobFlowOperator para criar o cluster EMR e depois o operator EmrAddStepsOperator para rodar um job spark. Isso facilitaria o pipeline caso precisasse escalar o processo.
+* The DAGs folder contains the extract_brewery_data.py file, which is the pipeline's DAG. It contains the DAG's main method, run_pipeline_brewery, which contains all the pipeline steps. Within this method, there are three more: extract_data, save_silver_layer, and save_gold_layer. These methods are used as Airflow task decorators within the DAG to facilitate project development. However, in a production environment, we could add Operators to better control the flow. In the case of PySpark processes, we could add the EmrCreateJobFlowOperator to create the EMR cluster and then the EmrAddStepsOperator to run a Spark job. This would streamline the pipeline if the process needed to scale.
 
 
 ## Monitoring/Alerting:
 
-* Para monitorar o processo, o airflow ja possue varios mecanismos para auxiliar. O mais básico é o proprio log que em cada DAG e nos processos dentro dela, o airflow ja possue um sistema facil de visualizar através da painel web , onde conseguimos visualizar a DAG e qual step deu erro naquele processo.
-Outro ponto para incluir nesse processo seria criar uma função `on_failure_callback` dentro da DAG para enviar, por exemplo, um email caso o processo desse erro. Existem outros mecanismos como alguns operators como SlackAPIPostOperator ou ExternalTaskSensor para enviar uma mensagem ou alertar em caso de erro no processo. No caso de alertas de qualidade ou de alguma regra de negocio o mesmo procedimento poderia ser feito, criando uma condições ou checks para validar os steps. Também poderia incluir a biblioteca greatExpectations para fazer as etapas de qualidades dos jobs.
+* To monitor the process, Airflow already has several mechanisms to assist. The most basic is the log itself, which is available for each DAG and the processes within it. Airflow already has an easy-to-view system through the web dashboard, where we can see the DAG and which step failed in that process.
+Another point to include in this process would be to create an `on_failure_callback` function within the DAG to send, for example, an email if the process encounters an error. Other mechanisms, such as operators like SlackAPIPostOperator or ExternalTaskSensor, can send a message or alert in case of process errors. For quality alerts or business rules, the same procedure could be followed, creating conditions or checks to validate the steps. The greatExpectations library could also be included to perform job quality steps.
 
 
 ## Execution
 
-* Esse projeto foi criado para rodar usando o serviço do s3 da Amazon para salvar os dados gerados. Portanto é necessário ter duas chaves de autenticação para poder rodar o processo, que são elas: `AWS_ACCESS_KEY_ID` e `AWS_SECRET_ACCESS_KEY`. Essas chaves são geradas na seguinte url da sua conta na aws: https://us-east-1.console.aws.amazon.com/iam/home?region=us-east-1#/security_credentials. Nesse link existe um botão **Create access key**. Após gerar as credenciais, favor baixa-las e pegar os codigos delas e incluir no arquivo **Makefile** de acordo com as respectivas variáveis.
+* This project was created to run using Amazon's S3 service to save the generated data. Therefore, it is necessary to have two authentication keys to run the process: `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`. These keys are generated at the following URL for your AWS account: https://us-east-1.console.aws.amazon.com/iam/home?region=us-east-1#/security_credentials. This link contains a **Create access key** button. After generating the credentials, please download them and grab their codes, including them in the **Makefile** file according to the respective variables.
 
 
 
-* A primeira etapa pra se executar nesse pipe é a de configuração e instalação. Para isso, na pasta raiz basta digitar o seguinte comando:
+* The first step to perform in this pipeline is configuration and installation. To do this, in the root folder, simply type the following command:
 
 ```
 make build
 
 ```
 
-* A segunda etapa é preparar o ambiente para ser executado. Basta digitar o seguinte comando também na pasta raiz:
+* The second step is prepare the environment for execution. Simply enter the following command, also in the root folder (Note: Before performing this step, configure the AWS credential keys mentioned above).:
 
 ```
 make start_environment
 
 ```
 
-* A terceira etapa é instalar as dependencias para rodar os testes.
+* The third step is to install the dependencies to run the tests.
 
 ```
 make install_dependencies
 
 ```
 
-* Para iniciar o pipeline e preparar o processo basta executar o seguinte comando:
+* To start the pipeline and prepare the process, simply run the following command (To access airflow web, username: airflow, password: airflow):
 
 ```
 make start_pipeline
 
 ```
 
-* Para rodar o pipeline basta executar o seguinte comando:
+* To run the pipeline, simply run the following command:
 
 ```
 make run_pipeline
 
 ```
 
-O seguinte comando é para desligar todos os serviços e limpar o ambiente:
+
+* It is possible after the pipeline is activated, to execute it manually through the following command:
+
+``` 
+make trigger_dag_manually
+
+```
+
+The following command is to disable all services and clean up the environment:
 
 ```
 
@@ -97,7 +105,7 @@ make stop_environment
 
 ```
 
-Para rodar os testes, basta executar o seguinte comando:
+To run the tests, simply run the following command:
 
 ```
 make run_test

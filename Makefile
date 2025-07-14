@@ -7,8 +7,8 @@ build:
 	docker build -t apache/airflow:3.0.1 .
 
 start_environment:
-	mkdir -p ./dags ./logs ./plugins ./config
 
+	mkdir -p ./dags ./logs ./plugins ./config
 	chmod -R 777 ./dags ./logs ./plugins ./config
 
 	@echo "AIRFLOW_UID=$$(id -u)\nAIRFLOW_GID=0" > .env
@@ -20,18 +20,18 @@ start_environment:
 
 	docker compose up airflow-init
 
-	virtualenv -p python3 .venv
+	virtualenv .venv
 
 install_dependencies:
-	. .venv/bin/activate
-
-	pip install -r requirements.txt
+	. .venv/bin/activate; pip install -r requirements.txt
 
 start_pipeline:
 	docker compose up -d
 	
 run_pipeline:
 	docker exec -it brewery_challenge-airflow-scheduler-1 airflow dags unpause run_pipeline_brewery
+
+trigger_dag_manually:
 	docker exec -it brewery_challenge-airflow-scheduler-1 airflow dags trigger run_pipeline_brewery
 
 stop_environment:
