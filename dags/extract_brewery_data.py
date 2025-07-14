@@ -2,14 +2,13 @@ from __future__ import annotations
 
 import pendulum
 from datetime import timedelta
-import json, os
 from airflow.sdk import ObjectStoragePath, dag, task
 from pyspark.sql import SparkSession
 
 
 api_url = "https://api.openbrewerydb.org/v1/breweries"
 
-base = ObjectStoragePath("s3://airflow-data-create/", conn_id="AWS_CONNECTION")
+base = ObjectStoragePath("s3://airflow-brewery-list/", conn_id="AWS_CONNECTION")
 
 
 @dag(
@@ -33,6 +32,7 @@ def run_pipeline_brewery():
         
         from extract_data_api import ExtractDataAPI
         
+        base.mkdir(exist_ok=True)
         path = base / "bronze" / f"brewery_list.json"
         extract = ExtractDataAPI(api_url)
         response = extract.fetch_data()
@@ -50,8 +50,6 @@ def run_pipeline_brewery():
         
         process_json_file = SaveSilverLayer(spark)
         process_json_file.process()
-
-        return base
     
     
     @task.pyspark(config_kwargs={"spark.jars.packages": "org.apache.hadoop:hadoop-aws:3.3.4,com.amazonaws:aws-java-sdk-bundle:1.12.787"})

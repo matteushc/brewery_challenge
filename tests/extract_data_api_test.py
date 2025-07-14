@@ -15,7 +15,7 @@ class TestExtractDataAPI(TestCase):
         self.api_url = "https://api.openbrewerydb.org/v1/breweries"
         self.access_key = os.getenv('AWS_ACCESS_KEY_ID', 'default_value')
         self.secret_key = os.getenv('AWS_SECRET_ACCESS_KEY', 'default_value')
-        self.path_s3 = "s3://airflow-data-create/"
+        self.path_s3 = "s3://airflow-brewery-list/"
         self.layer = "bronze"
         self.extractor = ExtractDataAPI(self.api_url)
 
