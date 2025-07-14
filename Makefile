@@ -27,3 +27,6 @@ run_pipeline:
 
 stop_environment:
 	docker compose down --volumes --rmi all
+
+run_test:
+	pytest tests/save_layer_test.py

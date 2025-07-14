@@ -40,21 +40,3 @@ class SaveGoldLayer:
         transformed_df.write \
             .mode("overwrite") \
             .parquet(f"s3a://{self.BUCKET_NAME}/{self.LAYER_TYPE}/brewery.parquet")
-
-
-if __name__ == "__main__":
-    
-    os.environ['SPARK_HOME'] = "/home/matteus-pa/projetos/airflow_desafio/.venv/lib/python3.10/site-packages/pyspark"
-    os.environ['PYSPARK_PYTHON'] = "python"
-    os.environ['PYSPARK_SUBMIT_ARGS'] = "--master local[2] pyspark-shell"
-    #os.environ['AWS_ACCESS_KEY_ID'] = ""
-    #os.environ['AWS_SECRET_ACCESS_KEY'] = ""
-    
-    spark = SparkSession \
-            .builder \
-            .appName("Pyspark S3 reader") \
-            .config('spark.jars.packages', 'org.apache.hadoop:hadoop-aws:3.3.4,com.amazonaws:aws-java-sdk-bundle:1.12.787')\
-            .getOrCreate()
-
-    process_json_file = SaveGoldLayer(spark)
-    process_json_file.process()

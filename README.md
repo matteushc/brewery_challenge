@@ -1,10 +1,19 @@
 # Code Challenge
 
-O pipeline desenvolvido aqui foi usando ferramentas como Docker, Python, Spark e airflow com orquestrador.
 
-The architecture used in this process was Medallion architecture which is based in ELT (Extract, Load, Transform) where data is extracted from API and save in bronze layer as json file, transformed into a suitable format that was parquet (silver laywer) and partitioned by brewery location, make some aggregations and then loaded into a gold layer.
+## Tools
 
-The project was defined based in airflow structure which is:
+* O pipeline desenvolvido aqui foi usando ferramentas como Docker, Python, Spark e airflow com orquestrador.
+
+
+## Architecture
+
+* The architecture used in this process was Medallion architecture which is based in ELT (Extract, Load, Transform) where data is extracted from API and save in bronze layer as json file, transformed into a suitable format that was parquet (silver laywer) and partitioned by brewery location, make some aggregations and then loaded into a gold layer.
+
+
+## Project Structure
+
+* The project was defined based in airflow structure which is:
 
     1. config - Para armazenar as configurações necessarias do airflow
 
@@ -16,6 +25,22 @@ The project was defined based in airflow structure which is:
 
     5. tests - Onde ficam os tests unitários.
 
+
+### plugins folder:
+
+* A pasta plugins foi usada nesse processo para armazenar os script para processamento do pipeline. Foram construidos 3 arquivos: extract_data_api.py, save_silver_layer.py e save_gold_layer.py. A ideia foi estruturar o processo segregado em scripts diferentes para modularizar e facilitar a manutenção de cada etapa do processo indivualemente.
+
+    - extract_data_api.py: Script responsável por extrair os dados da API `https://api.openbrewerydb.org/v1/breweries` e salvar um arquivo json na camada bronze.
+
+    - save_silver_layer.py: Script responsável por ler o arquivo json da camada bronze e transforma-lo em arquivo parquet particionado pela localização da brewery, e que nesse caso o escolhido foi country e state.
+
+    - save_gold_layer.py: Script responsável por ler o arquivo parquet da camada silver e agrega-lo pela quantidade de brewery pelo type and location e salvar num arquivo no formato parquet na camada gold.
+
+### dags
+
+* Na pasta DAGs contém o arquivo extract_brewery_data.py que é a DAG do pipeline. Ne
+
+## Execution
 
 A primeira etapa pra se executar nesse pipe é a de configuração e instalação. Para isso, na pasta raiz basta digitar o seguinte comando:
 

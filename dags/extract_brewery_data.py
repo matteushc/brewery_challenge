@@ -32,7 +32,7 @@ def run_pipeline_brewery():
     """
 
 
-    @task(retries=3, retry_delay=timedelta(seconds=5),)
+    @task(retries=3, retry_delay=timedelta(seconds=5))
     def extract_data(**kwargs):
         """
         #### Get Air Quality Data
