@@ -27,9 +27,9 @@ x-airflow-common:
     # The following line can be used to set a custom config file, stored in the local config folder
     AIRFLOW_CONFIG: '/opt/airflow/config/airflow.cfg'
 
-    AIRFLOW_CONN_AWS_CONNECTION: '{ "conn_type": "aws", "login": "", "password": ""}'
-    AWS_ACCESS_KEY_ID: ""
-    AWS_SECRET_ACCESS_KEY: ""
+    AIRFLOW_CONN_AWS_CONNECTION: '{ "conn_type": "aws", "login": "${AWS_ACCESS_KEY_ID}", "password": "${AWS_SECRET_ACCESS_KEY}"}'
+    AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID}"
+    AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"
 
   volumes:
     - ${AIRFLOW_PROJ_DIR:-.}/dags:/opt/airflow/dags

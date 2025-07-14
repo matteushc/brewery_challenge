@@ -7,8 +7,14 @@ build:
 	docker build -t apache/airflow:3.0.1 .
 
 start_environment:
-	mkdir ./dags ./logs ./plugins
-	echo -e "AIRFLOW_UID=$(id -u)\nAIRFLOW_GID=0" > .env
+	mkdir -p ./dags ./logs ./plugins ./config
+
+	chmod -R 777 ./dags ./logs ./plugins ./config
+
+	@echo "AIRFLOW_UID=$$(id -u)\nAIRFLOW_GID=0" > .env
+
+	@echo "AWS_ACCESS_KEY_ID=$$(AWS_ACCESS_KEY_ID)" >> .env
+	@echo "AWS_SECRET_ACCESS_KEY=$$(AWS_SECRET_ACCESS_KEY)" >> .env
 
 	docker compose run airflow-cli airflow config list
 
@@ -17,19 +23,22 @@ start_environment:
 	virtualenv -p python3 .venv
 
 install_dependencies:
-	source .venv/bin/activate
+	. .venv/bin/activate
+
 	pip install -r requirements.txt
 
 start_pipeline:
-	docker compose up -d
+	docker compose --env-file .env up -d
 	
 run_pipeline:
-	docker exec -it airflow-scheduler airflow dags trigger extract_brewery_data
+	docker exec -it brewery_challenge-airflow-scheduler-1 airflow dags unpause run_pipeline_brewery
+	docker exec -it brewery_challenge-airflow-scheduler-1 airflow dags trigger run_pipeline_brewery
 
 stop_environment:
 	docker compose down --volumes --rmi all
 
 run_test:
+	. .venv/bin/activate
 	pytest tests/save_layer_test.py
-	python tests/extract_data_api_test.py TestExtractDataAPI.test_fetch_data
-	python tests/extract_data_api_test.py TestExtractDataAPI.test_save_data_to_file
+	python3 tests/extract_data_api_test.py TestExtractDataAPI.test_fetch_data
+	python3 tests/extract_data_api_test.py TestExtractDataAPI.test_save_data_to_file

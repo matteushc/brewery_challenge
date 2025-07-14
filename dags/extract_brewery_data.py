@@ -17,11 +17,11 @@ def on_failure_callback(context):
     This can be used to send notifications or log errors.
     """
     # Implement your failure handling logic here
-    print(f"Task failed: {context['task_instance'].task_id} at {context['ts']}")
+    print(f"Task has failed, task_instance_key_str:")
 
 
 @dag(
-    schedule=None,
+    schedule="@daily",
     start_date=pendulum.datetime(2025, 1, 1, tz="UTC"),
     catchup=False,
     on_failure_callback=on_failure_callback,
@@ -50,7 +50,7 @@ def run_pipeline_brewery():
         extract.write_file(path, json_bytes)
     
     
-    @task.pyspark(config_kwargs={"spark.jars.packages": "org.apache.hadoop:hadoop-aws:3.3.4,com.amazonaws:aws-java-sdk-bundle:1.12.787"})
+    @task.pyspark(retries=3, retry_delay=timedelta(seconds=5), config_kwargs={"spark.jars.packages": "org.apache.hadoop:hadoop-aws:3.3.4,com.amazonaws:aws-java-sdk-bundle:1.12.787"})
     def save_silver_layer(spark: SparkSession):
         """
         Save the extracted data to the silver layer in S3.
@@ -62,7 +62,7 @@ def run_pipeline_brewery():
         process_json_file.process()
     
     
-    @task.pyspark(config_kwargs={"spark.jars.packages": "org.apache.hadoop:hadoop-aws:3.3.4,com.amazonaws:aws-java-sdk-bundle:1.12.787"})
+    @task.pyspark(retries=3, retry_delay=timedelta(seconds=5), config_kwargs={"spark.jars.packages": "org.apache.hadoop:hadoop-aws:3.3.4,com.amazonaws:aws-java-sdk-bundle:1.12.787"})
     def save_gold_layer(spark: SparkSession):
         """
         Save the processed data to the gold layer in S3.
