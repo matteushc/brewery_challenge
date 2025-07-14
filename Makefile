@@ -15,6 +15,8 @@ start_environment:
 	docker compose up airflow-init
 
 	virtualenv -p python3 .venv
+
+install_dependencies:
 	source .venv/bin/activate
 	pip install -r requirements.txt
 
@@ -22,7 +24,6 @@ start_pipeline:
 	docker compose up -d
 	
 run_pipeline:
-
 	docker exec -it airflow-scheduler airflow dags trigger extract_brewery_data
 
 stop_environment:
@@ -30,3 +31,5 @@ stop_environment:
 
 run_test:
 	pytest tests/save_layer_test.py
+	python tests/extract_data_api_test.py TestExtractDataAPI.test_fetch_data
+	python tests/extract_data_api_test.py TestExtractDataAPI.test_save_data_to_file

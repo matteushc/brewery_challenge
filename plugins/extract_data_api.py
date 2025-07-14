@@ -33,9 +33,9 @@ class ExtractDataAPI:
         return json_bytes
 
 
-    def write_file(self, path: ObjectStoragePath, content: str):
+    def write_file(self, path_file: ObjectStoragePath, content: bytes):
         """Write the content to a file at the specified path.
         """
         logging.info("Writing content to file.")
-        with path.open("wb") as f:
+        with path_file.open("wb") as f:
             f.write(content)

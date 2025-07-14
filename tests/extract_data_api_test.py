@@ -1,3 +1,9 @@
+
+import sys
+from pathlib import Path
+path_to_src = Path(__file__).parent.parent
+sys.path.insert(0, str(path_to_src))
+
 from unittest import TestCase, main
 from plugins.extract_data_api import ExtractDataAPI
 from unittest.mock import mock_open, patch
@@ -29,16 +35,16 @@ class TestExtractDataAPI(TestCase):
         list_brewery = response.json()
         self.assertIsInstance(list_brewery, list)
         
-        
+
     def test_save_data_to_file(self):
         mock_file_handle = mock_open()
         import builtins
         
-        with patch('builtins.open', mock_file_handle):
-            data = 'Hello, world!'
+        with patch('builtins.open', mock_file_handle) as mocked_file:
+            data = b'Hello, world!'
             self.extractor.write_file(builtins, data)
 
-            mock_file_handle().write.assert_called_once_with(data)
+        mocked_file().write.assert_called_once_with(data)
 
 
     def test_run_extractor(self):

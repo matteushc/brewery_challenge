@@ -1,4 +1,4 @@
-# Code Challenge
+# Brewery Challenge
 
 
 ## Tools
@@ -38,39 +38,58 @@
 
 ### dags
 
-* Na pasta DAGs contém o arquivo extract_brewery_data.py que é a DAG do pipeline. Ne
+
+* Na pasta DAGs contém o arquivo extract_brewery_data.py que é a DAG do pipeline. Nele está o metodo principal da DAG chamado run_pipeline_brewery, onde vai conter todas as etapas do pipeline. Dentro desse metodo existem mais 3, extract_data, save_silver_layer e save_gold_layer. Esses metodos estão como task decorator do airflow dentro da DAG para facilitar o desenvolvimento do projeto, porém num ambiente de produção poderiamos colocar os Operators para controlar melhor o fluxo. No caso dos processos pyspark poderiamos colocar o EmrCreateJobFlowOperator para criar o cluster EMR e depois o operator EmrAddStepsOperator para rodar um job spark. Isso facilitaria o pipeline caso precisasse escalar o processo.
+
+
+## Monitoring/Alerting:
+
+* Para monitorar o processo, o airflow ja possue varios mecanismos para auxiliar. O mais básico é o proprio log que em cada DAG e nos processos dentro dela, o airflow ja possue um sistema facil de visualizar através da painel web , onde conseguimos visualizar a DAG e qual step deu erro naquele processo.
+Outro ponto para incluir nesse processo seria criar uma função `on_failure_callback` dentro da DAG para enviar, por exemplo, um email caso o processo desse erro. Existem outros mecanismos como alguns operators como SlackAPIPostOperator ou ExternalTaskSensor para enviar uma mensagem ou alertar em caso de erro no processo. No caso de alertas de qualidade ou de alguma regra de negocio o mesmo procedimento poderia ser feito, criando uma condições ou checks para validar os steps. Também poderia incluir a biblioteca greatExpectations para fazer as etapas de qualidades dos jobs.
+
 
 ## Execution
 
-A primeira etapa pra se executar nesse pipe é a de configuração e instalação. Para isso, na pasta raiz basta digitar o seguinte comando:
+* Esse projeto foi criado para rodar usando o serviço do s3 da Amazon para salvar os dados gerados. Portanto é necessário ter duas chaves de autenticação para poder rodar o processo, que são elas: `AWS_ACCESS_KEY_ID` e `AWS_SECRET_ACCESS_KEY`. 
+
+
+
+* A primeira etapa pra se executar nesse pipe é a de configuração e instalação. Para isso, na pasta raiz basta digitar o seguinte comando:
 
 ```
 make build
 
 ```
 
-A segunda etapa é preparar o ambiente para ser executado. Basta digitar o seguinte comando também na pasta raiz:
+* A segunda etapa é preparar o ambiente para ser executado. Basta digitar o seguinte comando também na pasta raiz:
 
 ```
 make start_environment
 
 ```
 
-A terceira etapa é escolher que tipo de pipe vai rodar, pipe completo ou por dia. Existe o por dia que pode ser executado da seguinte maneira:
+* A terceira etapa é instalar as dependencias para rodar os testes.
 
 ```
-make run_pipeline_date DATA=19980504
+make install_dependencies
 
 ```
 
-O completo basta digitar o seguinte comando:
+* Para iniciar o pipeline e preparar o processo basta executar o seguinte comando:
+
+```
+make start_pipeline
+
+```
+
+* Para rodar o pipeline basta executar o seguinte comando:
 
 ```
 make run_pipeline
 
 ```
 
-O seguinte comando é para para todos os serviços:
+O seguinte comando é para desligar todos os serviços e limpar o ambiente:
 
 ```
 
@@ -78,8 +97,9 @@ make stop_environment
 
 ```
 
+Para rodar os testes, basta executar o seguinte comando:
 
-O Resutado será uma pasta chamada tables dentro da pasta data e outra chamada result_data.csv que tem o resultado final num arquivo csv.
+```
+make run_test
 
-
-** Obs: Um ponto importante é que para otmizar a leitura e escrita da tabela ORDERS foi utilizado a estratégia de particionar tanto na leitura quanto na escrita o que reduz bastante o volume de dados necessário pra rodar numa maquina. Nada impede que possa ser carregada por pedaços maiores caso haja um cluster com maior capacidade.
+```
